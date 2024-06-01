@@ -10,7 +10,7 @@ export class TicketService {
       
    }
 
-   public readonly tickets: Ticket [] = [
+   public tickets: Ticket [] = [
       {
          id: UuidAdapters.v4(),
          number: 1,
@@ -84,6 +84,7 @@ export class TicketService {
 
       this.workingOnTickets.unshift( {...ticket} );
       this.onTicketNumberChanged();
+      this.onWorkingOnChanged();
       return {
          status: 'ok',
          ticket
@@ -94,7 +95,7 @@ export class TicketService {
       const ticket = this.tickets.find( t => t.id ===id );
       if ( !ticket ) return { status: 'error', message: 'No se ha encontrado ese ticket' };
 
-      this.tickets.map( ticket => {
+      this.tickets = this.tickets.map( ticket => {
          if ( ticket.id === id ) {
             ticket.done;
          }
@@ -105,5 +106,8 @@ export class TicketService {
 
    private onTicketNumberChanged(){
       this.wssService.sendMessage( 'on-ticket-count-change', this.pendingTickets.length );
+   }
+   private onWorkingOnChanged(){
+      this.wssService.sendMessage( 'on-working-changed', this.lastWorkingOnTickets );
    }
 }

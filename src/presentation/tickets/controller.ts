@@ -42,7 +42,7 @@ export class TicketController {
    }
    public workingOn = ( req: Request, res: Response) => {
       res.status(200).json({
-        ticket: this.ticketService.lastWorkingOnTickets
+        tickets: this.ticketService.lastWorkingOnTickets
       });
    }
 }
