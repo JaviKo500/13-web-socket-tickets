@@ -7,39 +7,40 @@ const btnDraw = document.querySelector('#btn-draw');
 const btnDone = document.querySelector('#btn-done');
 
 const currentTicketLbl = document.querySelector('small');
-const searchParams  = new URLSearchParams( window.location.search );
+const searchParams = new URLSearchParams(window.location.search);
 
 let workingTicket = null;
-if ( !searchParams.has('escritorio') ) {
+if (!searchParams.has('escritorio')) {
   window.location = 'index.html';
   throw new Error('escritorio is not available');
 }
 
-const deskNumber  = searchParams.get('escritorio');
+const deskNumber = searchParams.get('escritorio');
 
 deskHeader.innerText = deskNumber;
 
 loadInitCount();
 async function loadInitCount() {
   const pending = await fetch('/api/ticket/pending').then(resp => resp.json());
-  checkTicketCount( pending?.tickets?.length );
+  checkTicketCount(pending?.tickets?.length);
 }
 
-function checkTicketCount( currentCount = 0 ) {
-  if ( currentCount === 0 ) {
+function checkTicketCount(currentCount = 0) {
+  if (currentCount === 0) {
     noMoreAlert.classList.remove('d-none')
   } else {
     noMoreAlert.classList.add('d-none')
   }
-  lblPending.innerHTML  = currentCount;
+  lblPending.innerHTML = currentCount;
 }
 
 
 async function getTicket() {
+  await finishTicket();
   const { status, ticket, message } = await fetch(`/api/ticket/draw/${deskNumber}`).then(resp => resp.json());
   workingTicket = ticket;
 
-  if ( status === 'error' ) {
+  if (status === 'error') {
     workingTicket = null;
     currentTicketLbl.innerHTML = message;
     return;
@@ -49,16 +50,32 @@ async function getTicket() {
   currentTicketLbl.innerHTML = ticket.number;
 }
 
+async function finishTicket() {
+  if (!workingTicket) return;
+  const { status, message } = await fetch(
+    `/api/ticket/done/${workingTicket.id}`, {
+    method: 'PUT'
+  }).then(resp => resp.json());
+
+
+  if (status === 'error') {
+    workingTicket = null;
+    currentTicketLbl.innerHTML = message;
+    return;
+  }
+  currentTicketLbl.innerHTML = 'Nadie';
+  workingTicket = null;
+}
+
 function connectToWebSockets() {
 
   const socket = new WebSocket('ws://localhost:3000/ws');
 
   socket.onmessage = (event) => {
-    console.log(event.data);
     if (!event.data) return;
     const data = JSON.parse(event.data);
-    if ( data.type !== 'on-ticket-count-change' ) return;
-    checkTicketCount( data.payload );
+    if (data.type !== 'on-ticket-count-change') return;
+    checkTicketCount(data.payload);
   };
 
   socket.onclose = (event) => {
@@ -78,4 +95,5 @@ function connectToWebSockets() {
 
 connectToWebSockets();
 
-btnDraw.addEventListener( 'click', getTicket);
+btnDraw.addEventListener('click', getTicket);
+btnDone.addEventListener('click', finishTicket);
