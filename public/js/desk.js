@@ -3,9 +3,13 @@
 const lblPending = document.querySelector('#lbl-pending');
 const deskHeader = document.querySelector('h1');
 const noMoreAlert = document.querySelector('.alert');
+const btnDraw = document.querySelector('#btn-draw');
+const btnDone = document.querySelector('#btn-done');
 
+const currentTicketLbl = document.querySelector('small');
 const searchParams  = new URLSearchParams( window.location.search );
 
+let workingTicket = null;
 if ( !searchParams.has('escritorio') ) {
   window.location = 'index.html';
   throw new Error('escritorio is not available');
@@ -30,6 +34,20 @@ function checkTicketCount( currentCount = 0 ) {
   lblPending.innerHTML  = currentCount;
 }
 
+
+async function getTicket() {
+  const { status, ticket, message } = await fetch(`/api/ticket/draw/${deskNumber}`).then(resp => resp.json());
+  workingTicket = ticket;
+
+  if ( status === 'error' ) {
+    workingTicket = null;
+    currentTicketLbl.innerHTML = message;
+    return;
+  }
+
+  workingTicket = ticket;
+  currentTicketLbl.innerHTML = ticket.number;
+}
 
 function connectToWebSockets() {
 
@@ -59,3 +77,5 @@ function connectToWebSockets() {
 }
 
 connectToWebSockets();
+
+btnDraw.addEventListener( 'click', getTicket);

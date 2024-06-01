@@ -30,7 +30,7 @@ export class TicketController {
    public drawTicket = ( req: Request, res: Response) => {
       const { desk } = req.params; 
       res.status(200).json({
-         ticket: this.ticketService.drawTicket( desk )
+         ...this.ticketService.drawTicket( desk )
       });
    }
 

@@ -83,7 +83,7 @@ export class TicketService {
       ticket.handleAtDesk = desk;
 
       this.workingOnTickets.unshift( {...ticket} );
-      // TODO ws
+      this.onTicketNumberChanged();
       return {
          status: 'ok',
          ticket
