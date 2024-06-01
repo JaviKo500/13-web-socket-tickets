@@ -21,5 +21,9 @@ function main() {
 
   const httpServer = createServer( server.app );
   WssServices.initWss( { server: httpServer } );
-  server.start();
+  
+  httpServer.listen( envs.PORT, () => {
+    console.log('<--------------- JK App --------------->');
+    console.log('server listening on port ' + envs.PORT);
+  });
 }

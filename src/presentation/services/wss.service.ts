@@ -14,6 +14,7 @@ export class WssServices {
    private constructor( options: Options ) {
       const { server, path = '/ws' } = options;
       this.wss = new WebSocketServer( { server, path } );
+      this.start();
    }
 
    static get instance(): WssServices {
@@ -29,6 +30,8 @@ export class WssServices {
    }
 
    public start(){
+      console.log('init ws');
+      
       this.wss.on( 'connection', ( ws: WebSocket) => {
          console.log('<--------------- JK Wss.services --------------->');
          console.log('client connection');
