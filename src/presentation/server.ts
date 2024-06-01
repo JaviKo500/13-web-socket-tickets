@@ -3,7 +3,7 @@ import path from 'path';
 
 interface Options {
   port: number;
-  routes: Router;
+  routes?: Router;
   public_path?: string;
 }
 

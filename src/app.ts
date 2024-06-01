@@ -14,13 +14,13 @@ function main() {
 
   const server = new Server({
     port: envs.PORT,
-    routes: AppRoutes.routes,
   });
 
-  server.setRoutes( AppRoutes.routes );
-
+  
   const httpServer = createServer( server.app );
   WssServices.initWss( { server: httpServer } );
+
+  server.setRoutes( AppRoutes.routes );
   
   httpServer.listen( envs.PORT, () => {
     console.log('<--------------- JK App --------------->');
